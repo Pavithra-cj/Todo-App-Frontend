@@ -1,95 +1,306 @@
-import React, {useState, useEffect} from 'react'
-import Swal from 'sweetalert2'
+import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
+import { Icon } from "@iconify/react";
 
 const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState("Medium");
+  const [dueDate, setDueDate] = useState("");
+  const [errors, setErrors] = useState({});
 
-    useEffect(() => {
-        if (taskToEdit) {
-            setTitle(taskToEdit.title);
-            setDescription(taskToEdit.description);
-        } else {
-            setTitle('');
-            setDescription('');
+  useEffect(() => {
+    if (taskToEdit) {
+      setTitle(taskToEdit.title);
+      setDescription(taskToEdit.description || "");
+      setPriority(taskToEdit.priority || "Medium");
+      setDueDate(
+        taskToEdit.dueDate
+          ? new Date(taskToEdit.dueDate).toISOString().slice(0, 16)
+          : ""
+      );
+    } else {
+      setTitle("");
+      setDescription("");
+      setPriority("Medium");
+      setDueDate("");
+    }
+    setErrors({});
+  }, [taskToEdit, isOpen]);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!title.trim()) {
+      newErrors.title = "Title is required";
+    }
+
+    if (dueDate && new Date(dueDate) < new Date()) {
+      newErrors.dueDate = "Due date cannot be in the past";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      Swal.fire({
+        icon: "error",
+        title: "Validation Error",
+        text: "Please fix the errors in the form",
+        background: document.documentElement.classList.contains("dark")
+          ? "#1f2937"
+          : "#ffffff",
+        color: document.documentElement.classList.contains("dark")
+          ? "#f3f4f6"
+          : "#000000",
+      });
+      return;
+    }
+
+    const confirm = await Swal.fire({
+      title: "Are you sure?",
+      text: taskToEdit ? "Update this task?" : "Create a new task?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, proceed!",
+      cancelButtonText: "No, cancel!",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      background: document.documentElement.classList.contains("dark")
+        ? "#1f2937"
+        : "#ffffff",
+      color: document.documentElement.classList.contains("dark")
+        ? "#f3f4f6"
+        : "#000000",
+    });
+
+    if (confirm.isConfirmed) {
+      const task = {
+        title: title.trim(),
+        description: description.trim(),
+        priority,
+        dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+      };
+
+      if (taskToEdit) {
+        task.id = taskToEdit.id;
+      }
+
+      onSave(task);
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: taskToEdit
+          ? "Task updated successfully!"
+          : "Task created successfully!",
+        background: document.documentElement.classList.contains("dark")
+          ? "#1f2937"
+          : "#ffffff",
+        color: document.documentElement.classList.contains("dark")
+          ? "#f3f4f6"
+          : "#000000",
+      });
+
+      onClose();
+    }
+  };
+
+  const handleClose = () => {
+    if (title.trim() || description.trim()) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You have unsaved changes. Are you sure you want to close?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, close it!",
+        cancelButtonText: "No, keep editing",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        background: document.documentElement.classList.contains("dark")
+          ? "#1f2937"
+          : "#ffffff",
+        color: document.documentElement.classList.contains("dark")
+          ? "#f3f4f6"
+          : "#000000",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          onClose();
         }
-    }, [taskToEdit]);
+      });
+    } else {
+      onClose();
+    }
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!title.trim()) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Title is required!',
-            });
-            return;
-        }
-        
-        const confirm = await Swal.fire({
-            title: 'Are you sure?',
-            text: taskToEdit ? 'Update this task?' : 'Create a new task?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, proceed!',
-            cancelButtonText: 'No, cancel!'
-        });
+  const getPriorityIcon = (priority) => {
+    switch (priority) {
+      case "High":
+        return "mdi:flag";
+      case "Medium":
+        return "mdi:flag-outline";
+      case "Low":
+        return "mdi:flag-variant-outline";
+      default:
+        return "mdi:flag-outline";
+    }
+  };
 
-        if (confirm.isConfirmed) {
-            const task = { title, description };
-            if (taskToEdit) {
-                task.id = taskToEdit.id; 
-            }
-            onSave(task);
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: taskToEdit ? 'Task updated successfully!' : 'Task created successfully!',
-            });
-            onClose();
-        } else {
-            Swal.fire('Cancelled', 'Your task was not saved.', 'info');
-        }
-    };
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case "High":
+        return "text-red-500";
+      case "Medium":
+        return "text-yellow-500";
+      case "Low":
+        return "text-green-500";
+      default:
+        return "text-gray-500";
+    }
+  };
 
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-20'>
-        <div className='bg-white p-6 rounded w-full max-w-md'>
-            <h2 className='text-xl font-bold mb-4'>{taskToEdit ? 'Update Task' : 'Add New Task'}</h2>
-            <form onSubmit={handleSubmit} className='space-y-4'>
-                <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Task Title"
-                    className='w-full border p-2 rounded' 
-                />
-                <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Task Description"
-                    className='w-full border p-2 rounded'
-                    rows="4"
-                />
-                <div className='flex justify-end gap-3'>
-                    <button
-                        type='button'
-                        onClick={onClose}
-                        className='px-4 py-2 bg-gray-300 rounded'>
-                        Cancel
-                    </button>
-                    <button
-                        type='submit'
-                        className='px-4 py-2 bg-blue-600 text-white rounded'>
-                        {taskToEdit ? 'Update Task' : 'Add Task'}
-                    </button>
-                </div>
-            </form>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            {taskToEdit ? "Update Task" : "Add New Task"}
+          </h2>
+          <button
+            onClick={handleClose}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+          >
+            <Icon icon="mdi:close" className="text-xl" />
+          </button>
         </div>
-    </div>
-  )
-}
 
-export default TaskForm
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Title Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <Icon icon="mdi:text" className="inline mr-1" />
+              Title <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter task title"
+              className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 ${
+                errors.title
+                  ? "border-red-500 dark:border-red-400"
+                  : "border-gray-300 dark:border-gray-600"
+              }`}
+            />
+            {errors.title && (
+              <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                <Icon icon="mdi:alert-circle" className="text-sm" />
+                {errors.title}
+              </p>
+            )}
+          </div>
+
+          {/* Description Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <Icon icon="mdi:text-box" className="inline mr-1" />
+              Description
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter task description (optional)"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 resize-none transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+              rows="3"
+            />
+          </div>
+
+          {/* Priority Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <Icon icon="mdi:flag" className="inline mr-1" />
+              Priority
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {["Low", "Medium", "High"].map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPriority(p)}
+                  className={`px-3 py-2 rounded-lg border transition-colors flex items-center justify-center gap-1 text-sm font-medium ${
+                    priority === p
+                      ? "bg-indigo-600 text-white border-indigo-600 dark:bg-indigo-500 dark:border-indigo-500"
+                      : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  }`}
+                >
+                  <Icon
+                    icon={getPriorityIcon(p)}
+                    className={
+                      priority === p ? "text-white" : getPriorityColor(p)
+                    }
+                  />
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Due Date Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <Icon icon="mdi:calendar" className="inline mr-1" />
+              Due Date
+            </label>
+            <input
+              type="datetime-local"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              min={new Date().toISOString().slice(0, 16)}
+              className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${
+                errors.dueDate
+                  ? "border-red-500 dark:border-red-400"
+                  : "border-gray-300 dark:border-gray-600"
+              }`}
+            />
+            {errors.dueDate && (
+              <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                <Icon icon="mdi:alert-circle" className="text-sm" />
+                {errors.dueDate}
+              </p>
+            )}
+          </div>
+
+          {/* Form Actions */}
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors flex items-center gap-2"
+            >
+              <Icon icon="mdi:close" className="text-sm" />
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors flex items-center gap-2"
+            >
+              <Icon
+                icon={taskToEdit ? "mdi:content-save" : "mdi:plus"}
+                className="text-sm"
+              />
+              {taskToEdit ? "Update Task" : "Add Task"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default TaskForm;
