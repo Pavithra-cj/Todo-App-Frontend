@@ -25,7 +25,7 @@ It connects to a **Spring Boot backend** (Dockerized) running at `http://localho
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/todo-frontend.git
+git clone https://github.com/Pavithra-cj/Todo-App-Frontend.git
 cd todo-frontend
 ```
 
