@@ -90,23 +90,39 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
         task.id = taskToEdit.id;
       }
 
-      onSave(task);
+      try {
+        await onSave(task);
 
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: taskToEdit
-          ? "Task updated successfully!"
-          : "Task created successfully!",
-        background: document.documentElement.classList.contains("dark")
-          ? "#1f2937"
-          : "#ffffff",
-        color: document.documentElement.classList.contains("dark")
-          ? "#f3f4f6"
-          : "#000000",
-      });
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: taskToEdit
+            ? "Task updated successfully!"
+            : "Task created successfully!",
+          background: document.documentElement.classList.contains("dark")
+            ? "#1f2937"
+            : "#ffffff",
+          color: document.documentElement.classList.contains("dark")
+            ? "#f3f4f6"
+            : "#000000",
+        });
 
-      onClose();
+        onClose();
+      } catch (error) {
+        console.error("Error saving task:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to save task. Please try again.",
+          background: document.documentElement.classList.contains("dark")
+            ? "#1f2937"
+            : "#ffffff",
+          color: document.documentElement.classList.contains("dark")
+            ? "#f3f4f6"
+            : "#000000",
+        });
+        return;
+      }
     }
   };
 
@@ -167,23 +183,24 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+      <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <Icon icon={taskToEdit ? "mdi:pencil" : "mdi:plus"} />
             {taskToEdit ? "Update Task" : "Add New Task"}
           </h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <Icon icon="mdi:close" className="text-xl" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Title Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               <Icon icon="mdi:text" className="inline mr-1" />
               Title <span className="text-red-500">*</span>
             </label>
@@ -192,10 +209,8 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter task title"
-              className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 ${
-                errors.title
-                  ? "border-red-500 dark:border-red-400"
-                  : "border-gray-300 dark:border-gray-600"
+              className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors bg-white text-gray-900 placeholder-gray-500 ${
+                errors.title ? "border-red-500" : "border-gray-300"
               }`}
             />
             {errors.title && (
@@ -208,7 +223,7 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
 
           {/* Description Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               <Icon icon="mdi:text-box" className="inline mr-1" />
               Description
             </label>
@@ -216,14 +231,14 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Enter task description (optional)"
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 resize-none transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-colors bg-white text-gray-900 placeholder-gray-500"
               rows="3"
             />
           </div>
 
           {/* Priority Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               <Icon icon="mdi:flag" className="inline mr-1" />
               Priority
             </label>
@@ -235,8 +250,8 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
                   onClick={() => setPriority(p)}
                   className={`px-3 py-2 rounded-lg border transition-colors flex items-center justify-center gap-1 text-sm font-medium ${
                     priority === p
-                      ? "bg-indigo-600 text-white border-indigo-600 dark:bg-indigo-500 dark:border-indigo-500"
-                      : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                   }`}
                 >
                   <Icon
@@ -253,7 +268,7 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
 
           {/* Due Date Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               <Icon icon="mdi:calendar" className="inline mr-1" />
               Due Date
             </label>
@@ -262,10 +277,8 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
               min={new Date().toISOString().slice(0, 16)}
-              className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${
-                errors.dueDate
-                  ? "border-red-500 dark:border-red-400"
-                  : "border-gray-300 dark:border-gray-600"
+              className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors bg-white text-gray-900 ${
+                errors.dueDate ? "border-red-500" : "border-gray-300"
               }`}
             />
             {errors.dueDate && (
@@ -281,14 +294,14 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors flex items-center gap-2"
             >
               <Icon icon="mdi:close" className="text-sm" />
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
             >
               <Icon
                 icon={taskToEdit ? "mdi:content-save" : "mdi:plus"}
