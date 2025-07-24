@@ -247,20 +247,20 @@ const TodoApp = () => {
             setSearchQuery={setSearchQuery}
           />
 
-          {/* Navigation Tabs */}
-          <NavigationTabs
-            currentView={currentView}
-            setCurrentView={setCurrentView}
-          />
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <NavigationTabs
+              currentView={currentView}
+              setCurrentView={setCurrentView}
+            />
 
-          {/* Add Task Button */}
-          <button
-            onClick={handleAddTask}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"
-          >
-            <Icon icon="mdi:plus" className="text-lg" />
-            Add Task
-          </button>
+            <button
+              onClick={handleAddTask}
+              className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors flex items-center justify-center gap-2 font-medium w-full sm:w-auto"
+            >
+              <Icon icon="mdi:plus" className="text-lg" />
+              Add Task
+            </button>
+          </div>
         </div>
 
         {/* Content Area */}

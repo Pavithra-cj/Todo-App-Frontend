@@ -209,7 +209,7 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter task title"
-              className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors bg-white text-gray-900 placeholder-gray-500 ${
+              className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors bg-white text-gray-900 placeholder-gray-500 ${
                 errors.title ? "border-red-500" : "border-gray-300"
               }`}
             />
@@ -231,7 +231,7 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Enter task description (optional)"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-colors bg-white text-gray-900 placeholder-gray-500"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none transition-colors bg-white text-gray-900 placeholder-gray-500"
               rows="3"
             />
           </div>
@@ -250,7 +250,7 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
                   onClick={() => setPriority(p)}
                   className={`px-3 py-2 rounded-lg border transition-colors flex items-center justify-center gap-1 text-sm font-medium ${
                     priority === p
-                      ? "bg-blue-600 text-white border-blue-600"
+                      ? "bg-teal-600 text-white border-teal-600"
                       : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                   }`}
                 >
@@ -277,7 +277,7 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
               min={new Date().toISOString().slice(0, 16)}
-              className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors bg-white text-gray-900 ${
+              className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors bg-white text-gray-900 ${
                 errors.dueDate ? "border-red-500" : "border-gray-300"
               }`}
             />
@@ -301,7 +301,7 @@ const TaskForm = ({ isOpen, onClose, onSave, taskToEdit }) => {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors flex items-center gap-2"
             >
               <Icon
                 icon={taskToEdit ? "mdi:content-save" : "mdi:plus"}

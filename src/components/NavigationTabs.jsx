@@ -31,7 +31,7 @@ const NavigationTabs = ({ currentView, setCurrentView }) => {
           onClick={() => setCurrentView(tab.value)}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
             currentView === tab.value
-              ? "bg-blue-600 text-white shadow-sm"
+              ? "bg-teal-600 text-white shadow-sm"
               : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
           }`}
           title={tab.description}
