@@ -65,15 +65,17 @@ docker-compose up --build
 
 ```graphql
 src/
+├── TodoApp.jsx (Main component)
 ├── components/
-│   ├── model/
-│   │   └── TaskCard.jsx
+│   ├── TaskCard.jsx
+│   ├── TaskTable.jsx
 │   ├── TaskForm.jsx
-│   └── TaskList.jsx
-├── service/
-│   └── taskService.js
-├── App.jsx
-└── main.jsx
+│   ├── SearchBar.jsx
+│   ├── NavigationTabs.jsx
+│   ├── CompletedTasksList.jsx
+│   └── EmptyState.jsx
+└── services/
+    └── taskService.js (Your existing API service)
 ```
 
 ## 🧠 Tech Stack
