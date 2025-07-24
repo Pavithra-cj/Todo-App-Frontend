@@ -3,39 +3,6 @@ import Swal from "sweetalert2";
 import { Icon } from "@iconify/react";
 
 const TaskCard = ({ task, onEdit, onComplete, onDelete }) => {
-  const confirmDelete = () => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-      background: document.documentElement.classList.contains("dark")
-        ? "#1f2937"
-        : "#ffffff",
-      color: document.documentElement.classList.contains("dark")
-        ? "#f3f4f6"
-        : "#000000",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        onDelete(task.id);
-        Swal.fire({
-          title: "Deleted!",
-          text: "Your task has been deleted.",
-          icon: "success",
-          background: document.documentElement.classList.contains("dark")
-            ? "#1f2937"
-            : "#ffffff",
-          color: document.documentElement.classList.contains("dark")
-            ? "#f3f4f6"
-            : "#000000",
-        });
-      }
-    });
-  };
-
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "High":
@@ -101,7 +68,7 @@ const TaskCard = ({ task, onEdit, onComplete, onDelete }) => {
             <Icon icon="mdi:pencil" className="text-lg" />
           </button>
           <button
-            onClick={() => confirmDelete(task.id)}
+            onClick={() => onDelete(task.id)}
             className="p-1 text-gray-400 hover:text-red-600 transition-colors"
             title="Delete task"
           >
