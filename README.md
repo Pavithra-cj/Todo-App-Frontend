@@ -75,7 +75,7 @@ src/
 │   ├── CompletedTasksList.jsx
 │   └── EmptyState.jsx
 └── services/
-    └── taskService.js (Your existing API service)
+    └── taskService.js
 ```
 
 ## 🧠 Tech Stack
